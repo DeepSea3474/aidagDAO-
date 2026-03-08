@@ -1,0 +1,57 @@
+modules = ["nodejs-20", "web", "postgresql-16"]
+run = "npm run dev"
+hidden = [".config", ".git", "generated-icon.png", "node_modules", "dist"]
+
+[nix]
+channel = "stable-24_05"
+packages = ["util-linux", "libuuid"]
+
+[[ports]]
+localPort = 5000
+externalPort = 80
+
+[env]
+PORT = "5000"
+
+[deployment]
+deploymentTarget = "autoscale"
+run = ["node", "./dist/index.cjs"]
+build = ["npm", "run", "build"]
+
+[workflows]
+runButton = "Project"
+
+[[workflows.workflow]]
+name = "Project"
+mode = "parallel"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "Start application"
+
+[[workflows.workflow]]
+name = "Start application"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "npm run dev"
+waitForPort = 5000
+
+[userenv]
+
+[userenv.shared]
+VITE_DAO_WALLET = "0xC16eC985D98Db96DE104Bf1e39E1F2Fdb9a712E9"
+VITE_FOUNDER_WALLET = "0xFf01Fa9D5d1e5FCc539eFB9654523A657F32ed23"
+VITE_TOKEN_CONTRACT = "0xe6B06f7C63F6AC84729007ae8910010F6E721041"
+VITE_OPERATION_WALLET = "0x0ffe438e047dfb08c0c79aac9a63ea32d49a272c"
+VITE_PRESALE_CONTRACT = "0xc0c050c064cc46ceca7dc5339244515c8a29590b"
+VITE_PRESALE_STAGE1 = "0.078"
+VITE_PRESALE_STAGE2 = "0.093"
+VITE_LISTING_PRICE = "0.12"
+VITE_TOKEN_SUPPLY = "17999000"
+VITE_PRESALE_TARGET = "10000000"
+
+[agent]
+integrations = ["javascript_openai_ai_integrations:2.0.0"]

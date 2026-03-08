@@ -1,0 +1,115 @@
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.20;
+
+interface IDexRouter {
+    function addLiquidity(
+        address tokenA,
+        address tokenB,
+        uint amountA,
+        uint amountB,
+        uint minA,
+        uint minB,
+        address to,
+        uint deadline
+    ) external returns (uint amountAddedA, uint amountAddedB, uint liquidity);
+
+    function removeLiquidity(
+        address tokenA,
+        address tokenB,
+        uint liquidity,
+        uint minA,
+        uint minB,
+        address to,
+        uint deadline
+    ) external returns (uint amountA, uint amountB);
+}
+
+contract AidagGovernance {
+    address public daoIdentity;
+    address public soulwareAI;
+    bool public emergencyStopped;
+
+    // Parametreler
+    uint256 public feeRate;        
+    uint256 public vestingPeriod;  
+    uint256 public distributionRate; 
+
+    // Event loglar
+    event AIActionExecuted(string action, address executor);
+    event AIActionRolledBack(string action, address dao);
+    event EmergencyStopped(address triggeredBy);
+
+    event LiquidityAdded(address tokenA, address tokenB, uint amountA, uint amountB);
+    event LiquidityRemoved(address tokenA, address tokenB, uint liquidity);
+    event CexListingTriggered(string exchange, string pair, address triggeredBy);
+
+    event FeeRateUpdated(uint256 newRate, address updatedBy);
+    event VestingPeriodUpdated(uint256 newPeriod, address updatedBy);
+    event DistributionRateUpdated(uint256 newRate, address updatedBy);
+
+    modifier onlyAI() {
+        require(msg.sender == soulwareAI, "Only SoulwareAI can execute");
+        require(!emergencyStopped, "Emergency stop active");
+        _;
+    }
+
+    modifier onlyDAO() {
+        require(msg.sender == daoIdentity, "Only DAO can execute");
+        _;
+    }
+
+    constructor(address _daoIdentity, address _soulwareAI) {
+        daoIdentity = _daoIdentity;
+        soulwareAI = _soulwareAI;
+        feeRate = 30; // varsayılan %0.3
+        vestingPeriod = 180 days;
+        distributionRate = 2; // varsayılan %2
+    }
+
+    // 🔹 SoulwareAI zincirde işlem yapabilir
+    function executeByAI(string memory action) external onlyAI {
+        emit AIActionExecuted(action, msg.sender);
+    }
+
+    // 🔹 DAO rollback
+    function rollbackByDAO(string memory action) external onlyDAO {
+        emit AIActionRolledBack(action, msg.sender);
+    }
+
+    // 🔹 Güvenlik freni
+    function emergencyStop() external onlyDAO {
+        emergencyStopped = true;
+        emit EmergencyStopped(msg.sender);
+    }
+
+    function resumeSystem() external onlyDAO {
+        emergencyStopped = false;
+    }
+
+    // 🔹 DEX likidite yönetimi
+    function addDexLiquidity(
+        address router,
+        address tokenA,
+        address tokenB,
+        uint amountA,
+        uint amountB
+    ) external onlyAI {
+        IDexRouter dex = IDexRouter(router);
+        dex.addLiquidity(tokenA, tokenB, amountA, amountB, 0, 0, address(this), block.timestamp + 600);
+        emit LiquidityAdded(tokenA, tokenB, amountA, amountB);
+    }
+
+    function removeDexLiquidity(
+        address router,
+        address tokenA,
+        address tokenB,
+        uint liquidity
+    ) external onlyAI {
+        IDexRouter dex = IDexRouter(router);
+        dex.removeLiquidity(tokenA, tokenB, liquidity, 0, 0, address(this), block.timestamp + 600);
+        emit LiquidityRemoved(tokenA, tokenB, liquidity);
+    }
+
+    // 🔹 CEX listeleme tetikleme
+    function triggerCexListing(string memory exchange, string memory pair) external onlyAI {
+        emit CexListingTriggered(exchange, pair, msg.sender);
