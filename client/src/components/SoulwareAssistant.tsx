@@ -97,7 +97,7 @@ export default function SoulwareAssistant() {
           .filter(m => m.id !== 0)
           .map(m => ({ role: m.role, content: m.content }));
 
-        const response = await fetch("/api/soulwareai", {
+        const response = await fetch("/soulwareai", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
