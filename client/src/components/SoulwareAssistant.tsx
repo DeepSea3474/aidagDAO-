@@ -35,6 +35,28 @@ export default function SoulwareAssistant() {
   ]);
   const [input, setInput] = useState("");
   const [isTyping, setIsTyping] = useState(false);
+const response = await fetch("/api/soulwareai", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({
+    messages: chatHistory,
+    language: lang,
+    founderMode: isFounderMode
+  }),
+  signal: abortRef.current.signal,
+});
+
+const data = await response.json();
+
+if (data.founderMode) {
+  setIsFounderMode(true);
+}
+
+setMessages(prev =>
+  prev.map(m =>
+    m.id === assistantId ? { ...m, content: data.reply } : m
+  )
+);
   const [isFounderMode, setIsFounderMode] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -70,75 +92,8 @@ export default function SoulwareAssistant() {
 
       const chatHistory = newMessages
         .filter(m => m.id !== 0)
-        .map(m => ({ role: m.role, content: m.content }));
-
-      const response = await fetch("/api/soulware/chat", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ messages: chatHistory, language: lang }),
-        signal: abortRef.current.signal,
-      });
-
-      if (!response.ok) {
-        throw new Error("API request failed");
-      }
-
-      const reader = response.body?.getReader();
-      if (!reader) throw new Error("No reader");
-
-      const decoder = new TextDecoder();
-      let buffer = "";
-
-      while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
-
-        buffer += decoder.decode(value, { stream: true });
-        const lines = buffer.split("\n");
-        buffer = lines.pop() || "";
-
-        for (const line of lines) {
-          if (!line.startsWith("data: ")) continue;
-          try {
-            const data = JSON.parse(line.slice(6));
-            if (data.founderMode) {
-              setIsFounderMode(true);
-            }
-            if (data.content) {
-              setMessages(prev =>
-                prev.map(m =>
-                  m.id === assistantId ? { ...m, content: m.content + data.content } : m
-                )
-              );
-            }
-            if (data.error) {
-              setMessages(prev =>
-                prev.map(m =>
-                  m.id === assistantId ? { ...m, content: m.content + "\n\n[Error: AI response interrupted]" } : m
-                )
-              );
-            }
-          } catch {}
-        }
-      }
-    } catch (err: any) {
-      if (err.name !== "AbortError") {
-        setMessages(prev =>
-          prev.map(m =>
-            m.id === assistantId
-              ? { ...m, content: lang === "tr"
-                  ? "Baglanti hatasi olustu. Lutfen tekrar deneyin."
-                  : "Connection error. Please try again." }
-              : m
-          )
-        );
-      }
-    } finally {
-      setIsTyping(false);
-      abortRef.current = null;
-    }
-  }, [input, isTyping, messages, lang]);
-
+        .map(m => ({ role: m.role, content: m.content }))
+     
   const quickActions: Record<string, string[]> = {
     en: ["How to buy AIDAG?", "40% revenue share?", "Join DAO", "Quantum projects"],
     tr: ["%40 gelir nasil kazanilir?", "AIDAG nasil alinir?", "DAO'ya katil", "Kuantum projeler"],
