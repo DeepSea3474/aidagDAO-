@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { MessageCircle, X, Send, Bot, User, Loader } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import soulwareAI from "../assets/soulwareai_1770572834003-Brx5nRHa.jpeg";
+import soulwareAI from "../assets/soulwareai_1770572.png";
 
 interface Message {
   id: number;
