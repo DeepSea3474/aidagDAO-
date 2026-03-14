@@ -1,17 +1,72 @@
-import { Link } from "wouter";
+import { Link, useLocation } from "wouter";
+import { LayoutDashboard, Home, HelpCircle } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 export default function Navigation() {
+  const [location] = useLocation();
+
   return (
-    <nav className="flex items-center justify-between p-4 bg-[#050505] border-b border-gray-900 shadow-2xl">
-      <div className="flex items-center gap-8">
-        <Link href="/" className="text-white font-black text-2xl tracking-tighter hover:text-[#00ff41] transition-colors">aidagDAO 🔱</Link>
-        <div className="flex gap-4 items-center">
-          <Link href="/" className="text-gray-400 hover:text-white text-sm font-bold uppercase tracking-widest transition-all">Dashboard</Link>
-          <Link href="/mainnet" className="bg-[#00ff41]/10 text-[#00ff41] px-3 py-1 rounded border border-[#00ff41]/20 hover:bg-[#00ff41] hover:text-black text-sm font-bold uppercase tracking-widest transition-all">🌐 Mainnet</Link>
+    <nav className="border-b border-border/40 bg-[#0a0a0a]/95 backdrop-blur-md sticky top-0 z-50">
+      <div className="container flex h-16 items-center justify-between px-4">
+        <div className="flex items-center gap-8">
+          <Link href="/" className="flex items-center gap-3 shrink-0 cursor-pointer group">
+            <img 
+              src="/assets/aidag-logo_1770572833982-IJmwKujp.jpg" 
+              alt="aidagDAO Logo" 
+              className="h-10 w-10 rounded-full object-cover border border-white/10 shadow-[0_0_10px_rgba(255,255,255,0.1)] group-hover:scale-110 transition-transform"
+            />
+            <div className="flex items-baseline font-black text-2xl tracking-tighter italic">
+              <span className="text-white drop-shadow-[0_0_8px_rgba(255,255,255,0.3)]">
+                aidag
+              </span>
+              <span className="bg-gradient-to-br from-[#00f2ff] via-[#0062ff] to-[#000000] bg-clip-text text-transparent drop-shadow-[0_0_12px_rgba(0,242,255,0.4)] ml-0.5">
+                DAO
+              </span>
+            </div>
+          </Link>
+          
+          <div className="hidden md:flex gap-6">
+            <Link href="/">
+              <a className={cn(
+                "flex items-center gap-2 text-sm font-semibold transition-colors hover:text-white",
+                location === "/" ? "text-white" : "text-gray-400"
+              )}>
+                <Home className="h-4 w-4" />
+                Ana Sayfa
+              </a>
+            </Link>
+            <Link href="/dashboard">
+              <a className={cn(
+                "flex items-center gap-2 text-sm font-semibold transition-colors hover:text-white",
+                location === "/dashboard" ? "text-white" : "text-gray-400"
+              )}>
+                <LayoutDashboard className="h-4 w-4" />
+                Dashboard
+              </a>
+            </Link>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-3">
+          <Link href="/mainnet">
+            <a className={cn(
+              "flex items-center gap-2 px-3 py-1.5 rounded-full border transition-all cursor-pointer",
+              location === "/mainnet" 
+                ? "bg-cyan-500/20 border-cyan-500 text-cyan-400 shadow-[0_0_15px_rgba(0,242,255,0.2)]" 
+                : "bg-emerald-500/10 border-emerald-500/20 text-emerald-500 hover:bg-emerald-500/20"
+            )}>
+              <div className={cn("h-2 w-2 rounded-full bg-cyan-500", location !== "/mainnet" && "animate-pulse")} />
+              <span className="text-[10px] font-bold uppercase tracking-widest">
+                MAINNET ACTIVE
+              </span>
+            </a>
+          </Link>
+          
+          <button className="p-2 text-gray-400 hover:text-white transition-colors">
+            <HelpCircle className="h-5 w-5" />
+          </button>
         </div>
       </div>
     </nav>
   );
 }
-// Force Update: Sat Mar 14 19:59:41 CET 2026
-/* Unique ID: 1773514988 */
