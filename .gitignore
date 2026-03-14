@@ -5,3 +5,6 @@ server/public
 vite.config.ts.*
 *.tar.gzdist
 client/dist
+dist/
+client/dist/
+node_modules/
