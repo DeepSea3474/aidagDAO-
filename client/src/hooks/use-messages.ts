@@ -9,7 +9,7 @@ export function useCreateMessage() {
     mutationFn: async (data: InsertMessage) => {
       const validated = api.messages.create.input.parse(data);
       
-      const res = await fetch("/api/chat", {
+      const res = await fetch("/api/chat?v=2", {
         method: api.messages.create.method,
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(validated),
@@ -40,3 +40,4 @@ export function useCreateMessage() {
     },
   });
 }
+// Force Update: Sat Mar 14 19:59:41 CET 2026
