@@ -1,22 +1,23 @@
 import { Switch, Route } from "wouter";
 import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
-import { Toaster } from "./components/ui/toaster";
-import NotFound from "./pages/not-found";
-import Dashboard from "./pages/Dashboard";
-import Mainnet from "./pages/Mainnet";
+import { Toaster } from "@/components/ui/toaster";
+import Dashboard from "@/pages/Dashboard";
+import Mainnet from "@/pages/Mainnet";
+import Home from "@/pages/Home"; // Ana sayfanın ismi Home ise
 
 function Router() {
   return (
     <Switch>
-      <Route path="/" component={Dashboard} />
+      <Route path="/" component={Home} />
+      <Route path="/dashboard" component={Dashboard} />
       <Route path="/mainnet" component={Mainnet} />
-      <Route component={NotFound} />
+      <Route path="/:rest*" component={() => <div>404 - Sayfa Bulunamadı</div>} />
     </Switch>
   );
 }
 
-function App() {
+export default function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <Router />
@@ -24,5 +25,3 @@ function App() {
     </QueryClientProvider>
   );
 }
-
-export default App;
