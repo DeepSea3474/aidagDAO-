@@ -9,7 +9,7 @@ export function useCreateMessage() {
     mutationFn: async (data: InsertMessage) => {
       const validated = api.messages.create.input.parse(data);
       
-      const res = await fetch(api.messages.create.path, {
+      const res = await fetch("/api/chat", {
         method: api.messages.create.method,
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(validated),
